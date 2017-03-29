@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Added Canonical-module</name>
+    <code>canonical</code>
+    <version>1.0</version>
+    <file path="catalog/view/theme/default/template/common/header.tpl">
+        <operation>
+            <search><![CDATA[
+            <head>
+            ]]></search>
+            <add position="after"><![CDATA[
+                <?php if (isset($canonical_url)) { ?>
+                    <link rel="canonical" href="<?= $canonical_url ?>">
+                <?php } ?>
+            ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/common/header.php">
+        <operation>
+            <search><![CDATA[
+            function index() {
+            ]]></search>
+            <add position="after"><![CDATA[
+                        $this->load->model('module/canonical');
+                        if (strpos($_SERVER['REQUEST_URI'], '?',0) == '') {
+                            $path = substr($_SERVER['REQUEST_URI'],1);
+                        }
+                        else {
+                            $path = substr($_SERVER['REQUEST_URI'],1,strpos($_SERVER['REQUEST_URI'], '?',0)-1);
+                        }
+
+                        $get_canonical_url_result = $this->model_module_canonical->getCanonicalUrl($path,$_GET);
+
+                        if ($get_canonical_url_result != null) {
+                            $data['canonical_url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $get_canonical_url_result;
+                        }
+            ]]></add> 
+        </operation>
+    </file>
+</modification>
